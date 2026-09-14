@@ -427,8 +427,261 @@
     /* 这层是透明的，用户看不见但摸得着 */
     background: transparent;
 }
+
+/* ===== 背景介绍弹窗 ===== */
+.lore-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.75);
+    z-index: 9998;
+    justify-content: center;
+    align-items: center;
+    animation: lightboxFadeIn 0.3s ease;
+    padding: 20px;
+    box-sizing: border-box;
+}
+.lore-modal.active {
+    display: flex;
+}
+
+.lore-modal-content {
+    position: relative;
+    width: 100%;
+    max-width: 1000px;
+    height: 80vh;
+    max-height: 700px;
+    background: #fcf9f5;
+    border-radius: 20px;
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: lorePopIn 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@keyframes lorePopIn {
+    from { opacity: 0; transform: scale(0.94) translateY(20px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.lore-modal-title {
+    text-align: center;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 6px;
+    color: #4a3f35;
+    padding: 22px 20px 16px;
+    border-bottom: 2px solid #e8e0d6;
+    flex-shrink: 0;
+}
+
+.lore-close {
+    position: absolute;
+    top: 14px;
+    right: 22px;
+    font-size: 34px;
+    color: #aaa;
+    cursor: pointer;
+    line-height: 1;
+    transition: all 0.2s;
+    z-index: 10;
+}
+.lore-close:hover {
+    color: #4a3f35;
+    transform: rotate(90deg);
+}
+
+/* 左右分栏容器 */
+.lore-panels {
+    display: flex;
+    flex: 1;
+    min-height: 0; /* 关键：让子元素能正确滚动 */
+    gap: 0;
+}
+
+/* 单个面板 */
+.lore-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    min-width: 0;
+}
+.lore-panel:first-child {
+    border-right: 2px solid #e8e0d6;
+}
+
+/* 面板头部（头像+名字） */
+.lore-panel-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 18px 24px 14px;
+    flex-shrink: 0;
+    background: #f8f4ee;
+}
+.lore-avatar {
+    font-size: 34px;
+    width: 52px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    flex-shrink: 0;
+}
+.lore-name {
+    font-size: 19px;
+    font-weight: 700;
+    color: #2a2a2a;
+    letter-spacing: 2px;
+}
+.lore-subtitle {
+    font-size: 13px;
+    color: #999;
+    margin-top: 2px;
+    letter-spacing: 1px;
+}
+
+/* 可滚动区域 */
+.lore-scroll {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px 26px 30px;
+    font-size: 15px;
+    line-height: 1.95;
+    color: #3d3d3d;
+    cursor: grab;
+    scroll-behavior: smooth;
+    /* 防止拖拽时选中文字 */
+    user-select: none;
+}
+.lore-scroll.dragging {
+    cursor: grabbing;
+    scroll-behavior: auto;
+}
+.lore-scroll p {
+    margin-bottom: 16px;
+    text-indent: 2em;
+}
+.lore-scroll p:last-child {
+    margin-bottom: 0;
+}
+
+/* 滚动条美化 */
+.lore-scroll::-webkit-scrollbar {
+    width: 6px;
+}
+.lore-scroll::-webkit-scrollbar-track {
+    background: #f0ebe4;
+    border-radius: 10px;
+}
+.lore-scroll::-webkit-scrollbar-thumb {
+    background: #c9b28b;
+    border-radius: 10px;
+}
+.lore-scroll::-webkit-scrollbar-thumb:hover {
+    background: #b09d78;
+}
+
+/* 底部提示 */
+.lore-hint {
+    text-align: center;
+    font-size: 12px;
+    color: #bbb;
+    padding: 10px 20px 14px;
+    flex-shrink: 0;
+    border-top: 1px solid #f0ebe4;
+    letter-spacing: 1px;
+}
+
+/* 移动端：上下排列 */
+@media (max-width: 768px) {
+    .lore-modal-content {
+        height: 88vh;
+        max-height: none;
+    }
+    .lore-panels {
+        flex-direction: column;
+    }
+    .lore-panel:first-child {
+        border-right: none;
+        border-bottom: 2px solid #e8e0d6;
+    }
+    .lore-modal-title {
+        font-size: 18px;
+        letter-spacing: 4px;
+        padding: 18px 50px 14px 20px;
+    }
+    .lore-close {
+        font-size: 30px;
+        top: 12px;
+        right: 16px;
+    }
+    .lore-scroll {
+        padding: 16px 20px 24px;
+        font-size: 14px;
+    }
+}
     </style>
 </head>
+
+    <!-- ===== 背景介绍弹窗 ===== -->
+    <div class="lore-modal" id="loreModal">
+        <div class="lore-modal-content">
+            <span class="lore-close" id="loreClose">&times;</span>
+            <div class="lore-modal-title">✦ 背景介绍 ✦</div>
+
+            <div class="lore-panels">
+                <!-- 左侧人物 -->
+                <div class="lore-panel">
+                    <div class="lore-panel-header">
+                        <span class="lore-avatar">🌙</span>
+                        <div>
+                            <div class="lore-name">星尘</div>
+                            <div class="lore-subtitle">星穹旅者</div>
+                        </div>
+                    </div>
+                    <div class="lore-scroll">
+                        <p>在银河的尽头，有一颗早已熄灭的恒星。星尘曾是那颗星上最后的意识体，在大坍缩前夕，他将文明的诗篇刻入了自己的灵魂。</p>
+                        <p>此后无数纪元，他乘坐着一艘由月光编织的小舟，在宇宙的裂缝中拾取散落的记忆。他来到这个世界，是为了寻找一段失落的旋律——据说那旋律能修补星辰之间的裂痕。</p>
+                        <p>但他不知道的是，那旋律其实就藏在他所遇见的人类梦境之中。每当他吹响长笛，总有人会在梦中看见一片星海。</p>
+                        <p>他的旅途没有终点，因为记忆本身就是他的故乡。</p>
+                        <p>【这里继续补充更多文字，滚动条会自动出现】</p>
+                        <p>他曾在第七纪元遇见过一位沉默的骑士，也在幻梦之森中与狐妖共饮过月光。这些相遇最终都化作了星环上的一道道刻痕。</p>
+                        <p>如今，他停驻在这座城市的上空，等待着下一个愿意倾听星声的人。</p>
+                    </div>
+                </div>
+
+                <!-- 右侧人物 -->
+                <div class="lore-panel">
+                    <div class="lore-panel-header">
+                        <span class="lore-avatar">🔥</span>
+                        <div>
+                            <div class="lore-name">焰影</div>
+                            <div class="lore-subtitle">灰烬骑士</div>
+                        </div>
+                    </div>
+                    <div class="lore-scroll">
+                        <p>他曾经是王都最年轻的骑士团长。在一场宫廷政变中，他的军团被诬陷为叛军，全员葬身火海。</p>
+                        <p>他从灰烬中爬出，右臂被永远烙印上了诅咒的黑焰。那火焰不会熄灭，也不会灼伤他，却时刻提醒着他那一夜的背叛。</p>
+                        <p>如今他游走于法外之地，只为了寻找当年告密者的线索。他的剑从不轻易出鞘，因为出鞘必沾染因果。</p>
+                        <p>【这里继续补充更多文字，滚动条会自动出现】</p>
+                        <p>有人说他冷酷无情，但只有被他救过的流民知道，他会在深夜把自己的干粮分给饥饿的孩子。</p>
+                        <p>他与星尘的相遇是一场意外——一个追寻记忆，一个背负仇恨，却在同一片星空下停下了脚步。</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lore-hint">💡 可在左右区域分别滚动或拖动查看</div>
+        </div>
+    </div>
+    
 <body>
 
     <!-- ========== 右侧导航栏 (7个标签) ========== -->
@@ -457,6 +710,16 @@
             </p>
             <div style="margin-top:60px; font-size:14px; color:#aaa; border-top:1px solid #eee; padding-top:20px;">
                 ✦ 点击右侧标签开始探索 ✦
+            </div>
+                 <!-- 背景介绍入口卡片 -->
+            <div class="entry-card" onclick="openLoreModal()" style="display:block; margin-top: 24px; padding: 30px 40px; background: linear-gradient(135deg, #3a4a5a 0%, #2a3a4a 100%); border-radius: 20px; color: #f0ebe4; box-shadow: 0 8px 30px rgba(0,0,0,0.15); transition: transform 0.3s, box-shadow 0.3s; cursor: pointer;">
+                <div style="display: flex; align-items: center; gap: 24px; flex-wrap: wrap;">
+                    <span style="font-size: 48px;">📖</span>
+                    <div>
+                        <h2 style="margin: 0; font-size: 28px; letter-spacing: 2px;">✦ 背景介绍 ✦</h2>
+                        <p style="margin: 8px 0 0 0; opacity: 0.8; font-size: 16px;">了解两位核心人物的过往 ➜</p>
+                    </div>
+                </div>
             </div>
         </section>
 
@@ -900,6 +1163,94 @@
                 }
             });
         })();
+
+            // =============================================
+    // 背景介绍弹窗
+    // =============================================
+    (function() {
+        const modal = document.getElementById('loreModal');
+        const closeBtn = document.getElementById('loreClose');
+
+        // 打开弹窗（供首页 onclick 调用）
+        window.openLoreModal = function() {
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            // 每次打开重置滚动位置到顶部
+            document.querySelectorAll('.lore-scroll').forEach(el => {
+                el.scrollTop = 0;
+            });
+        };
+
+        // 关闭弹窗
+        function closeLoreModal() {
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        // 关闭按钮
+        if (closeBtn) {
+            closeBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                closeLoreModal();
+            });
+        }
+
+        // 点击背景关闭（点击内容区不关闭）
+        if (modal) {
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    closeLoreModal();
+                }
+            });
+        }
+
+        // ESC 键关闭
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && modal && modal.classList.contains('active')) {
+                closeLoreModal();
+            }
+        });
+
+        // ===== 鼠标拖拽滚动（每个面板独立生效） =====
+        document.querySelectorAll('.lore-scroll').forEach(scrollEl => {
+            let isDown = false;
+            let startY = 0;
+            let startScrollTop = 0;
+            let moved = false;
+
+            scrollEl.addEventListener('mousedown', function(e) {
+                // 只响应左键
+                if (e.button !== 0) return;
+                isDown = true;
+                moved = false;
+                startY = e.pageY;
+                startScrollTop = scrollEl.scrollTop;
+                scrollEl.classList.add('dragging');
+            });
+
+            // 在 document 上监听移动和抬起，避免鼠标移出元素后失效
+            document.addEventListener('mousemove', function(e) {
+                if (!isDown) return;
+                e.preventDefault();
+                const delta = e.pageY - startY;
+                if (Math.abs(delta) > 3) moved = true;
+                scrollEl.scrollTop = startScrollTop - delta;
+            });
+
+            document.addEventListener('mouseup', function() {
+                if (!isDown) return;
+                isDown = false;
+                scrollEl.classList.remove('dragging');
+            });
+
+            // 防止拖拽时触发图片原生拖拽
+            scrollEl.addEventListener('dragstart', function(e) {
+                e.preventDefault();
+            });
+        });
+
+        // 触摸滑动已由浏览器原生支持（overflow-y: auto），无需额外处理
+    })();
     </script>
 </body>
 </html>
