@@ -1126,6 +1126,31 @@
 
         </section>
 
+                <!-- ################ 服设图鉴（独立页面） ################ -->
+        <section id="costume-gallery" class="oc-page">
+            <div class="oc-header">
+                <h2>服设图鉴</h2>
+                <span>点击标签筛选</span>
+            </div>
+
+            <!-- 标签筛选栏 -->
+            <div class="filter-bar" style="display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 30px; padding: 10px 0;">
+                <button class="filter-btn active" data-filter="all" style="padding: 8px 24px; border-radius: 30px; border: 2px solid #c9b28b; background: #c9b28b; color: #1e1e1e; font-weight: 600; cursor: pointer; transition: all 0.2s; font-size: 15px;">全部</button>
+                <button class="filter-btn" data-filter="古风" style="padding: 8px 24px; border-radius: 30px; border: 2px solid #ddd; background: transparent; color: #555; cursor: pointer; transition: all 0.2s; font-size: 15px;">古风</button>
+                <button class="filter-btn" data-filter="现代" style="padding: 8px 24px; border-radius: 30px; border: 2px solid #ddd; background: transparent; color: #555; cursor: pointer; transition: all 0.2s; font-size: 15px;">现代风</button>
+                <button class="filter-btn" data-filter="幻想" style="padding: 8px 24px; border-radius: 30px; border: 2px solid #ddd; background: transparent; color: #555; cursor: pointer; transition: all 0.2s; font-size: 15px;">幻想风</button>
+                <button class="filter-btn" data-filter="日常" style="padding: 8px 24px; border-radius: 30px; border: 2px solid #ddd; background: transparent; color: #555; cursor: pointer; transition: all 0.2s; font-size: 15px;">日常</button>
+                <button class="filter-btn" data-filter="礼服" style="padding: 8px 24px; border-radius: 30px; border: 2px solid #ddd; background: transparent; color: #555; cursor: pointer; transition: all 0.2s; font-size: 15px;">礼服</button>
+                <!-- 你可以按需增删标签按钮 -->
+            </div>
+
+            <!-- 图片网格容器（由 JS 动态渲染） -->
+            <div id="costumeGridContainer" style="min-height: 300px;">
+                <div class="image-grid" id="costumeGrid">
+                    <!-- JS 会在这里插入图片 -->
+                </div>
+            </div>
+        </section>
     </main>
 
     <!-- ==================== 图片放大模态框 ==================== -->
