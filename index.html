@@ -1283,275 +1283,198 @@
 
     <!-- ==================== JavaScript ==================== -->
     <script>
-        // ---------- 页面切换 ----------
-        const tags = document.querySelectorAll('.nav-tag');
-        const pages = document.querySelectorAll('.oc-page');
+/* ============================================================
+   0. 全局工具
+   ============================================================ */
+function qs(sel, parent = document) { return parent.querySelector(sel); }
+function qsa(sel, parent = document) { return Array.from(parent.querySelectorAll(sel)); }
 
-        tags.forEach(tag => {
-            tag.addEventListener('click', function() {
-                tags.forEach(t => t.classList.remove('active'));
-                this.classList.add('active');
+/* ============================================================
+   1. 页面切换（导航栏）
+   ============================================================ */
+function initPageSwitching() {
+    const tags = qsa('.nav-tag');
+    const pages = qsa('.oc-page');
+    const mainContent = qs('.main-content');
 
-                const targetId = this.dataset.target;
-                pages.forEach(page => page.classList.remove('active-page'));
-                const targetPage = document.getElementById(targetId);
-                if (targetPage) {
-                    targetPage.classList.add('active-page');
-                }
-                document.querySelector('.main-content').scrollTop = 0;
-            });
-        });
+    if (!tags.length || !pages.length) {
+        console.warn('[页面切换] 未找到 .nav-tag 或 .oc-page');
+        return;
+    }
 
-        // ---------- 图片点击放大 ----------
-        (function() {
-            const overlay = document.getElementById('lightboxOverlay');
-            const lightboxImg = document.getElementById('lightboxImage');
-            const closeBtn = document.getElementById('lightboxClose');
+    tags.forEach(tag => {
+        tag.addEventListener('click', function () {
+            const targetId = this.dataset.target;
+            if (!targetId) return;
 
-            // 为所有带 class="clickable-img" 的图片绑定点击
-            const images = document.querySelectorAll('.clickable-img');
-            images.forEach(img => {
-                img.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    lightboxImg.src = this.src;
-                    lightboxImg.alt = this.alt || '图片';
-                    overlay.classList.add('active');
-                    document.body.style.overflow = 'hidden';
-                });
-            });
+            // 切换导航高亮
+            tags.forEach(t => t.classList.remove('active'));
+            this.classList.add('active');
 
-            function closeLightbox() {
-                overlay.classList.remove('active');
-                document.body.style.overflow = '';
+            // 切换页面显示
+            pages.forEach(p => p.classList.remove('active-page'));
+            const targetPage = document.getElementById(targetId);
+            if (targetPage) {
+                targetPage.classList.add('active-page');
+            } else {
+                console.warn('[页面切换] 找不到 id 为', targetId, '的页面');
             }
 
-            closeBtn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                closeLightbox();
-            });
-
-            overlay.addEventListener('click', function(e) {
-                if (e.target === overlay) {
-                    closeLightbox();
-                }
-            });
-
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape' && overlay.classList.contains('active')) {
-                    closeLightbox();
-                }
-            });
-        })();
-
-            // =============================================
-    // 背景介绍弹窗
-    // =============================================
-    (function() {
-        const modal = document.getElementById('loreModal');
-        const closeBtn = document.getElementById('loreClose');
-
-        // 打开弹窗（供首页 onclick 调用）
-        window.openLoreModal = function() {
-            modal.classList.add('active');
-            document.body.style.overflow = 'hidden';
-            // 每次打开重置滚动位置到顶部
-            document.querySelectorAll('.lore-scroll').forEach(el => {
-                el.scrollTop = 0;
-            });
-        };
-
-        // 关闭弹窗
-        function closeLoreModal() {
-            modal.classList.remove('active');
-            document.body.style.overflow = '';
-        }
-
-        // 关闭按钮
-        if (closeBtn) {
-            closeBtn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                closeLoreModal();
-            });
-        }
-
-        // 点击背景关闭（点击内容区不关闭）
-        if (modal) {
-            modal.addEventListener('click', function(e) {
-                if (e.target === modal) {
-                    closeLoreModal();
-                }
-            });
-        }
-
-        // ESC 键关闭
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape' && modal && modal.classList.contains('active')) {
-                closeLoreModal();
+            // 切到服设图鉴时重新渲染（保证筛选状态正确）
+            if (targetId === 'costume-gallery' && typeof renderCostumeGallery === 'function') {
+                renderCostumeGallery(currentFilter);
             }
+
+            // 回到顶部
+            if (mainContent) mainContent.scrollTop = 0;
         });
+    });
 
-        // ===== 鼠标拖拽滚动（每个面板独立生效） =====
-        document.querySelectorAll('.lore-scroll').forEach(scrollEl => {
-            let isDown = false;
-            let startY = 0;
-            let startScrollTop = 0;
-            let moved = false;
-
-            scrollEl.addEventListener('mousedown', function(e) {
-                // 只响应左键
-                if (e.button !== 0) return;
-                isDown = true;
-                moved = false;
-                startY = e.pageY;
-                startScrollTop = scrollEl.scrollTop;
-                scrollEl.classList.add('dragging');
-            });
-
-            // 在 document 上监听移动和抬起，避免鼠标移出元素后失效
-            document.addEventListener('mousemove', function(e) {
-                if (!isDown) return;
-                e.preventDefault();
-                const delta = e.pageY - startY;
-                if (Math.abs(delta) > 3) moved = true;
-                scrollEl.scrollTop = startScrollTop - delta;
-            });
-
-            document.addEventListener('mouseup', function() {
-                if (!isDown) return;
-                isDown = false;
-                scrollEl.classList.remove('dragging');
-            });
-
-            // 防止拖拽时触发图片原生拖拽
-            scrollEl.addEventListener('dragstart', function(e) {
-                e.preventDefault();
-            });
-        });
-
-        // 触摸滑动已由浏览器原生支持（overflow-y: auto），无需额外处理
-    })();
-
-        // =============================================
-    // 1. 服设数据（在这里添加你的所有图片！）
-    // =============================================
-    const costumeData = [
-        // 格式：{ src: "图片路径", title: "名称", tags: ["标签1", "标签2"] }
-        { src: "./images/costumes/stardust-daily-1.jpg", title: "星尘·日常", tags: ["现代", "日常"] },
-        { src: "./images/costumes/stardust-formal-1.jpg", title: "星尘·礼服", tags: ["幻想", "礼服"] },
-        { src: "./images/costumes/flame-battle-1.jpg", title: "焰影·战甲", tags: ["幻想", "古风"] },
-        { src: "./images/costumes/flame-casual-1.jpg", title: "焰影·便装", tags: ["现代", "日常"] },
-        { src: "./images/costumes/xiyu-mermaid-1.jpg", title: "汐语·人鱼", tags: ["幻想", "礼服"] },
-        { src: "./images/costumes/linge-forest-1.jpg", title: "林歌·巡林", tags: ["古风", "幻想"] },
-        // ⭐ 在这里继续添加你的其他服设图片，标签可选：古风、现代、幻想、日常、礼服 等
-        // 示例：{ src: "./images/costumes/你的图片.jpg", title: "角色·服设名", tags: ["标签1", "标签2"] },
-    ];
-
-    // =============================================
-    // 2. 状态变量
-    // =============================================
-    let currentFilter = 'all';
-    let currentFilteredData = []; // 用于 Lightbox 切换
-
-    // =============================================
-    // 3. 渲染图鉴
-    // =============================================
-    function renderCostumeGallery(filter = 'all') {
-        const grid = document.getElementById('costumeGrid');
-        if (!grid) return;
-
-        // 筛选数据
-        const filtered = filter === 'all' 
-            ? costumeData 
-            : costumeData.filter(item => item.tags.includes(filter));
-        
-        currentFilteredData = filtered; // 存储供 Lightbox 使用
-
-        if (filtered.length === 0) {
-            grid.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: #999; padding: 40px 0;">😢 没有找到该标签下的服设，试试其他标签吧</p>`;
-            return;
+    // 首页入口：跳转到服设图鉴
+    window.switchToGallery = function () {
+        const galleryTag = qs('.nav-tag[data-target="costume-gallery"]');
+        if (galleryTag) {
+            galleryTag.click();
+        } else {
+            // 导航栏没有该标签时的兜底
+            pages.forEach(p => p.classList.remove('active-page'));
+            const targetPage = document.getElementById('costume-gallery');
+            if (targetPage) targetPage.classList.add('active-page');
+            if (typeof renderCostumeGallery === 'function') {
+                renderCostumeGallery(currentFilter);
+            }
         }
+    };
+}
 
-        // 生成 HTML
-        grid.innerHTML = filtered.map((item, index) => `
-            <div class="grid-item" data-index="${index}">
-                <div class="image-wrapper">
-                    <div class="image-mask"></div>
-                    <img class="clickable-img-set" src="${item.src}" alt="${item.title}" loading="lazy" data-index="${index}">
-                </div>
-                <div class="caption">
-                    ${item.title}
-                    <span class="tag-labels">${item.tags.map(tag => '#' + tag).join(' ')}</span>
-                </div>
+/* ============================================================
+   2. 服设图鉴（数据 + 筛选 + 渲染）
+   ============================================================ */
+
+// ⭐ 在这里维护你的所有服设图片
+const costumeData = [
+    // 格式：{ src: "图片路径", title: "名称", tags: ["标签1", "标签2"] }
+    { src: "./images/costumes/stardust-daily-1.jpg",  title: "星尘·日常",  tags: ["现代", "日常"] },
+    { src: "./images/costumes/stardust-formal-1.jpg", title: "星尘·礼服",  tags: ["幻想", "礼服"] },
+    { src: "./images/costumes/flame-battle-1.jpg",    title: "焰影·战甲",  tags: ["幻想", "古风"] },
+    { src: "./images/costumes/flame-casual-1.jpg",    title: "焰影·便装",  tags: ["现代", "日常"] },
+    { src: "./images/costumes/xiyu-mermaid-1.jpg",    title: "汐语·人鱼",  tags: ["幻想", "礼服"] },
+    { src: "./images/costumes/linge-forest-1.jpg",    title: "林歌·巡林",  tags: ["古风", "幻想"] },
+    // ⭐ 继续添加你的图片……
+];
+
+let currentFilter = 'all';
+let currentFilteredData = [];
+
+function renderCostumeGallery(filter = 'all') {
+    const grid = document.getElementById('costumeGrid');
+    if (!grid) {
+        console.warn('[服设图鉴] 未找到 #costumeGrid 容器');
+        return;
+    }
+
+    currentFilter = filter;
+
+    // 筛选
+    const filtered = (filter === 'all')
+        ? costumeData
+        : costumeData.filter(item => Array.isArray(item.tags) && item.tags.includes(filter));
+
+    currentFilteredData = filtered;
+
+    // 空状态
+    if (filtered.length === 0) {
+        grid.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: #999; padding: 40px 0;">😢 没有找到该标签下的服设，试试其他标签吧</p>`;
+        return;
+    }
+
+    // 渲染
+    grid.innerHTML = filtered.map((item, index) => `
+        <div class="grid-item" data-index="${index}">
+            <div class="image-wrapper">
+                <div class="image-mask"></div>
+                <img class="clickable-img-set"
+                     src="${item.src}"
+                     alt="${item.title}"
+                     loading="lazy"
+                     data-index="${index}">
             </div>
-        `).join('');
-    }
+            <div class="caption">
+                ${item.title}
+                <span class="tag-labels">${item.tags.map(t => '#' + t).join(' ')}</span>
+            </div>
+        </div>
+    `).join('');
+}
 
-    // =============================================
-    // 4. 筛选按钮事件绑定
-    // =============================================
-    function initFilterButtons() {
-        const buttons = document.querySelectorAll('.filter-btn');
-        buttons.forEach(btn => {
-            btn.addEventListener('click', function() {
-                // 切换激活状态
-                buttons.forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-                
-                // 执行筛选
-                const filter = this.dataset.filter;
-                currentFilter = filter;
-                renderCostumeGallery(filter);
-            });
+function initFilterButtons() {
+    const buttons = qsa('.filter-btn');
+    if (!buttons.length) return;
+
+    buttons.forEach(btn => {
+        btn.addEventListener('click', function () {
+            buttons.forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            renderCostumeGallery(this.dataset.filter || 'all');
         });
+    });
+}
+
+/* ============================================================
+   3. 升级版 Lightbox（服设图鉴专用，支持左右切换）
+   ============================================================ */
+function initGalleryLightbox() {
+    const overlay = document.getElementById('lightboxOverlay');
+    const lightboxImg = document.getElementById('lightboxImage');
+    const closeBtn = document.getElementById('lightboxClose');
+    const prevBtn = document.getElementById('lightboxPrev');
+    const nextBtn = document.getElementById('lightboxNext');
+    const counter = document.getElementById('lightboxCounter');
+    const gridContainer = document.getElementById('costumeGridContainer');
+
+    if (!overlay || !lightboxImg) {
+        console.warn('[Lightbox] 缺少必要的 DOM 元素');
+        return;
     }
 
-    // =============================================
-    // 5. 升级版 Lightbox（支持筛选结果内切换）
-    // =============================================
-    function initGalleryLightbox() {
-        const overlay = document.getElementById('lightboxOverlay');
-        const lightboxImg = document.getElementById('lightboxImage');
-        const closeBtn = document.getElementById('lightboxClose');
-        const prevBtn = document.getElementById('lightboxPrev');
-        const nextBtn = document.getElementById('lightboxNext');
-        const counter = document.getElementById('lightboxCounter');
+    let currentIndex = 0;
 
-        let currentIndex = 0;
+    function openLightbox(index) {
+        if (!currentFilteredData.length) return;
+        currentIndex = index;
+        updateImage();
+        overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
 
-        function openLightbox(index) {
-            if (!currentFilteredData.length) return;
-            currentIndex = index;
-            updateLightboxImage();
-            overlay.classList.add('active');
-            document.body.style.overflow = 'hidden';
-        }
+    function updateImage() {
+        const item = currentFilteredData[currentIndex];
+        if (!item) return;
+        lightboxImg.src = item.src;
+        lightboxImg.alt = item.title || '服设细节';
+        if (counter) counter.textContent = `${currentIndex + 1} / ${currentFilteredData.length}`;
+    }
 
-        function updateLightboxImage() {
-            const item = currentFilteredData[currentIndex];
-            if (!item) return;
-            lightboxImg.src = item.src;
-            lightboxImg.alt = item.title || '服设细节';
-            counter.textContent = `${currentIndex + 1} / ${currentFilteredData.length}`;
-        }
+    function prevImage() {
+        if (!currentFilteredData.length) return;
+        currentIndex = (currentIndex - 1 + currentFilteredData.length) % currentFilteredData.length;
+        updateImage();
+    }
 
-        function prevImage() {
-            if (currentFilteredData.length === 0) return;
-            currentIndex = (currentIndex - 1 + currentFilteredData.length) % currentFilteredData.length;
-            updateLightboxImage();
-        }
-        function nextImage() {
-            if (currentFilteredData.length === 0) return;
-            currentIndex = (currentIndex + 1) % currentFilteredData.length;
-            updateLightboxImage();
-        }
+    function nextImage() {
+        if (!currentFilteredData.length) return;
+        currentIndex = (currentIndex + 1) % currentFilteredData.length;
+        updateImage();
+    }
 
-        function closeLightbox() {
-            overlay.classList.remove('active');
-            document.body.style.overflow = '';
-        }
+    function closeLightbox() {
+        overlay.classList.remove('active');
+        document.body.style.overflow = '';
+    }
 
-        // --- 事件委托监听动态图片 ---
-        document.getElementById('costumeGridContainer').addEventListener('click', function(e) {
+    // 事件委托：点击图鉴里的图片
+    if (gridContainer) {
+        gridContainer.addEventListener('click', function (e) {
             const img = e.target.closest('.clickable-img-set');
             if (!img) return;
             e.stopPropagation();
@@ -1560,105 +1483,121 @@
                 openLightbox(index);
             }
         });
-
-        // 按钮事件
-        closeBtn.addEventListener('click', (e) => { e.stopPropagation(); closeLightbox(); });
-        prevBtn.addEventListener('click', (e) => { e.stopPropagation(); prevImage(); });
-        nextBtn.addEventListener('click', (e) => { e.stopPropagation(); nextImage(); });
-        overlay.addEventListener('click', (e) => { if (e.target === overlay) closeLightbox(); });
-        document.addEventListener('keydown', (e) => {
-            if (!overlay.classList.contains('active')) return;
-            if (e.key === 'Escape') closeLightbox();
-            else if (e.key === 'ArrowLeft') { prevImage(); e.preventDefault(); }
-            else if (e.key === 'ArrowRight') { nextImage(); e.preventDefault(); }
-        });
-
-        // 触摸滑动支持
-        let touchStartX = 0;
-        overlay.addEventListener('touchstart', (e) => { touchStartX = e.changedTouches[0].screenX; }, { passive: true });
-        overlay.addEventListener('touchend', (e) => {
-            if (!overlay.classList.contains('active')) return;
-            const diff = touchStartX - e.changedTouches[0].screenX;
-            if (Math.abs(diff) > 40) {
-                diff > 0 ? nextImage() : prevImage();
-            }
-        }, { passive: true });
     }
 
-    // =============================================
-    // 6. 页面切换 & 初始化
-    // =============================================
-    // 原有的页面切换逻辑（保留）
-    const tags = document.querySelectorAll('.nav-tag');
-    const pages = document.querySelectorAll('.oc-page');
+    // 关闭 / 上一张 / 下一张
+    if (closeBtn) closeBtn.addEventListener('click', e => { e.stopPropagation(); closeLightbox(); });
+    if (prevBtn)  prevBtn.addEventListener('click',  e => { e.stopPropagation(); prevImage(); });
+    if (nextBtn)  nextBtn.addEventListener('click',  e => { e.stopPropagation(); nextImage(); });
 
-    tags.forEach(tag => {
-        tag.addEventListener('click', function() {
-            tags.forEach(t => t.classList.remove('active'));
-            this.classList.add('active');
-            const targetId = this.dataset.target;
-            pages.forEach(page => page.classList.remove('active-page'));
-            const targetPage = document.getElementById(targetId);
-            if (targetPage) {
-                targetPage.classList.add('active-page');
-                // 如果切换到服设图鉴，重新渲染（以防万一）
-                if (targetId === 'costume-gallery') {
-                    renderCostumeGallery(currentFilter);
-                }
-            }
-            document.querySelector('.main-content').scrollTop = 0;
-        });
+    // 点击背景关闭
+    overlay.addEventListener('click', e => {
+        if (e.target === overlay) closeLightbox();
     });
 
-    // 新增：从首页入口跳转
-    function switchToGallery() {
-        // 触发导航点击
-        const galleryTag = document.querySelector('.nav-tag[data-target="costume-gallery"]');
-        if (galleryTag) {
-            galleryTag.click();
-        } else {
-            // 如果导航栏没有，直接显示
-            pages.forEach(page => page.classList.remove('active-page'));
-            const targetPage = document.getElementById('costume-gallery');
-            if (targetPage) targetPage.classList.add('active-page');
-            renderCostumeGallery(currentFilter);
+    // 键盘
+    document.addEventListener('keydown', e => {
+        if (!overlay.classList.contains('active')) return;
+        if (e.key === 'Escape') closeLightbox();
+        else if (e.key === 'ArrowLeft')  { prevImage(); e.preventDefault(); }
+        else if (e.key === 'ArrowRight') { nextImage(); e.preventDefault(); }
+    });
+
+    // 触摸滑动
+    let touchStartX = 0;
+    overlay.addEventListener('touchstart', e => {
+        touchStartX = e.changedTouches[0].screenX;
+    }, { passive: true });
+
+    overlay.addEventListener('touchend', e => {
+        if (!overlay.classList.contains('active')) return;
+        const diff = touchStartX - e.changedTouches[0].screenX;
+        if (Math.abs(diff) > 40) {
+            diff > 0 ? nextImage() : prevImage();
         }
+    }, { passive: true });
+}
+
+/* ============================================================
+   4. 背景介绍弹窗（左右独立滚动 + 拖拽）
+   ============================================================ */
+function initLoreModal() {
+    const modal = document.getElementById('loreModal');
+    const closeBtn = document.getElementById('loreClose');
+    if (!modal) return;
+
+    window.openLoreModal = function () {
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+        qsa('.lore-scroll').forEach(el => { el.scrollTop = 0; });
+    };
+
+    function closeLoreModal() {
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
     }
 
-    // =============================================
-    // 7. 页面加载完成后的初始化
-    // =============================================
-    document.addEventListener('DOMContentLoaded', function() {
-        // 在导航栏中动态添加“服设图鉴”入口（如果不想手动加）
-        const sidebar = document.querySelector('.sidebar');
-        if (sidebar && !document.querySelector('.nav-tag[data-target="costume-gallery"]')) {
-            const newTag = document.createElement('div');
-            newTag.className = 'nav-tag';
-            newTag.dataset.target = 'costume-gallery';
-            newTag.textContent = '👗 服设图鉴';
-            sidebar.appendChild(newTag);
-            // 重新绑定点击事件（简单处理：重新执行上面的绑定逻辑，但避免重复，这里建议直接放在初始化里）
-            // 更好的方式：将绑定逻辑提取为函数，这里为了简化，手动添加监听
-            newTag.addEventListener('click', function() {
-                tags.forEach(t => t.classList.remove('active'));
-                this.classList.add('active');
-                pages.forEach(page => page.classList.remove('active-page'));
-                const targetPage = document.getElementById('costume-gallery');
-                if (targetPage) {
-                    targetPage.classList.add('active-page');
-                    renderCostumeGallery(currentFilter);
-                }
-                document.querySelector('.main-content').scrollTop = 0;
-            });
-        }
+    if (closeBtn) {
+        closeBtn.addEventListener('click', e => {
+            e.stopPropagation();
+            closeLoreModal();
+        });
+    }
 
-        // 初始化筛选按钮
-        initFilterButtons();
-        // 初始化 Lightbox
-        initGalleryLightbox();
-        // 首次渲染（默认全部）
-        renderCostumeGallery('all');
+    modal.addEventListener('click', e => {
+        if (e.target === modal) closeLoreModal();
     });
+
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape' && modal.classList.contains('active')) {
+            closeLoreModal();
+        }
+    });
+
+    // 拖拽滚动（每个面板独立）
+    qsa('.lore-scroll').forEach(scrollEl => {
+        let isDown = false;
+        let startY = 0;
+        let startScrollTop = 0;
+
+        scrollEl.addEventListener('mousedown', e => {
+            if (e.button !== 0) return;
+            isDown = true;
+            startY = e.pageY;
+            startScrollTop = scrollEl.scrollTop;
+            scrollEl.classList.add('dragging');
+        });
+
+        document.addEventListener('mousemove', e => {
+            if (!isDown) return;
+            e.preventDefault();
+            scrollEl.scrollTop = startScrollTop - (e.pageY - startY);
+        });
+
+        document.addEventListener('mouseup', () => {
+            if (!isDown) return;
+            isDown = false;
+            scrollEl.classList.remove('dragging');
+        });
+
+        scrollEl.addEventListener('dragstart', e => e.preventDefault());
+    });
+}
+
+/* ============================================================
+   5. 初始化（DOM 加载完成后统一执行）
+   ============================================================ */
+document.addEventListener('DOMContentLoaded', function () {
+    initPageSwitching();
+    initFilterButtons();
+    initGalleryLightbox();
+    initLoreModal();
+
+    // 首次渲染服设图鉴（默认显示全部）
+    renderCostumeGallery('all');
+
+    console.log('✅ 所有功能初始化完成');
+});
     </script>
 </body>
 </html>
