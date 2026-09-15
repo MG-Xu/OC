@@ -689,6 +689,67 @@
         font-size: 22px !important;
     }
 }
+
+/* ===== 筛选按钮交互 ===== */
+.filter-btn {
+    padding: 8px 24px;
+    border-radius: 30px;
+    border: 2px solid #ddd;
+    background: transparent;
+    color: #555;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    font-size: 15px;
+    font-weight: 500;
+}
+.filter-btn:hover {
+    border-color: #c9b28b;
+    color: #2a2a2a;
+    background: #f8f5f0;
+}
+.filter-btn.active {
+    border-color: #c9b28b;
+    background: #c9b28b;
+    color: #1e1e1e;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(201, 178, 139, 0.3);
+}
+
+/* ===== 服设图鉴网格（稍微密集一点） ===== */
+#costumeGrid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 16px;
+}
+#costumeGrid .grid-item img {
+    height: 180px;
+}
+/* 图片下方显示标签小字 */
+#costumeGrid .grid-item .caption .tag-labels {
+    display: inline-block;
+    font-size: 11px;
+    color: #c9b28b;
+    background: #f4f0ea;
+    padding: 0 10px;
+    border-radius: 12px;
+    margin-top: 2px;
+}
+
+/* 移动端适配 */
+@media (max-width: 500px) {
+    #costumeGrid {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 10px;
+    }
+    #costumeGrid .grid-item img {
+        height: 130px;
+    }
+    .entry-card {
+        padding: 20px !important;
+    }
+    .entry-card h2 {
+        font-size: 22px !important;
+    }
+}
     </style>
 </head>
 
