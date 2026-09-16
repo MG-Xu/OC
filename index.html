@@ -1308,16 +1308,27 @@
                 <span>点击标签筛选</span>
             </div>
 
-            <!-- 标签筛选栏 -->
-            <div class="filter-bar" style="display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 30px; padding: 10px 0;">
-                <button class="filter-btn active" data-filter="all" style="padding: 8px 24px; border-radius: 30px; border: 2px solid #c9b28b; background: #c9b28b; color: #1e1e1e; font-weight: 600; cursor: pointer; transition: all 0.2s; font-size: 15px;">全部</button>
-                <button class="filter-btn" data-filter="古风" style="padding: 8px 24px; border-radius: 30px; border: 2px solid #ddd; background: transparent; color: #555; cursor: pointer; transition: all 0.2s; font-size: 15px;">古风</button>
-                <button class="filter-btn" data-filter="现代" style="padding: 8px 24px; border-radius: 30px; border: 2px solid #ddd; background: transparent; color: #555; cursor: pointer; transition: all 0.2s; font-size: 15px;">现代风</button>
-                <button class="filter-btn" data-filter="幻想" style="padding: 8px 24px; border-radius: 30px; border: 2px solid #ddd; background: transparent; color: #555; cursor: pointer; transition: all 0.2s; font-size: 15px;">幻想风</button>
-                <button class="filter-btn" data-filter="日常" style="padding: 8px 24px; border-radius: 30px; border: 2px solid #ddd; background: transparent; color: #555; cursor: pointer; transition: all 0.2s; font-size: 15px;">日常</button>
-                <button class="filter-btn" data-filter="礼服" style="padding: 8px 24px; border-radius: 30px; border: 2px solid #ddd; background: transparent; color: #555; cursor: pointer; transition: all 0.2s; font-size: 15px;">礼服</button>
-                <!-- 你可以按需增删标签按钮 -->
-            </div>
+<!-- 标签筛选栏 -->
+<div class="filter-bar" style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 30px; padding: 10px 0;">
+
+    <!-- 第一组：风格 -->
+    <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
+        <span style="font-size: 13px; color: #999; width: 50px;">风格：</span>
+        <button class="filter-btn active" data-filter="all">全部</button>
+        <button class="filter-btn" data-filter="古风">古风</button>
+        <button class="filter-btn" data-filter="现代">现代风</button>
+        <button class="filter-btn" data-filter="幻想">幻想风</button>
+    </div>
+
+    <!-- 第二组：性别 -->
+    <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
+        <span style="font-size: 13px; color: #999; width: 50px;">性别：</span>
+        <button class="filter-btn" data-filter="男">男</button>
+        <button class="filter-btn" data-filter="女">女</button>
+    </div>
+
+
+</div>
 
             <!-- 图片网格容器（由 JS 动态渲染） -->
             <div id="costumeGridContainer" style="min-height: 300px;">
@@ -1378,7 +1389,7 @@ function initPageSwitching() {
 
             // 切到服设图鉴时重新渲染（保证筛选状态正确）
             if (targetId === 'costume-gallery' && typeof renderCostumeGallery === 'function') {
-                renderCostumeGallery(currentFilter);
+                renderCostumeGallery();
             }
 
             // 回到顶部
@@ -1397,7 +1408,7 @@ function initPageSwitching() {
             const targetPage = document.getElementById('costume-gallery');
             if (targetPage) targetPage.classList.add('active-page');
             if (typeof renderCostumeGallery === 'function') {
-                renderCostumeGallery(currentFilter);
+                renderCostumeGallery();
             }
         }
     };
@@ -1410,32 +1421,33 @@ function initPageSwitching() {
 // ⭐ 在这里维护你的所有服设图片
 const costumeData = [
     // 格式：{ src: "图片路径", title: "名称", tags: ["标签1", "标签2"] }
-    { src: "images/69EC9E25EE9D65C3CF0A75284206120D.png",  title: "黄稠云",  tags: ["古风"] },
+    { src: "images/69EC9E25EE9D65C3CF0A75284206120D.png",  title: "黄稠云",  tags:  ["古风", "女"] },
     // ⭐ 继续添加你的图片……
 ];
 
-let currentFilter = 'all';
+let currentFilter = [];
 let currentFilteredData = [];
 
-function renderCostumeGallery(filter = 'all') {
+function renderCostumeGallery() {
     const grid = document.getElementById('costumeGrid');
     if (!grid) {
         console.warn('[服设图鉴] 未找到 #costumeGrid 容器');
         return;
     }
 
-    currentFilter = filter;
-
-    // 筛选
-    const filtered = (filter === 'all')
+    // 核心筛选逻辑：图片必须包含所有选中的标签
+    const filtered = currentFilters.length === 0
         ? costumeData
-        : costumeData.filter(item => Array.isArray(item.tags) && item.tags.includes(filter));
+        : costumeData.filter(item =>
+            Array.isArray(item.tags) &&
+            currentFilters.every(f => item.tags.includes(f))
+        );
 
     currentFilteredData = filtered;
 
     // 空状态
     if (filtered.length === 0) {
-        grid.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: #999; padding: 40px 0;">😢 没有找到该标签下的服设，试试其他标签吧</p>`;
+        grid.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: #999; padding: 40px 0;">😢 没有符合当前筛选条件的服设，试试取消一些标签吧</p>`;
         return;
     }
 
@@ -1464,9 +1476,33 @@ function initFilterButtons() {
 
     buttons.forEach(btn => {
         btn.addEventListener('click', function () {
-            buttons.forEach(b => b.classList.remove('active'));
-            this.classList.add('active');
-            renderCostumeGallery(this.dataset.filter || 'all');
+            const filter = this.dataset.filter;
+            if (!filter) return;
+
+            if (filter === 'all') {
+                // 点“全部”：清空所有筛选
+                currentFilters = [];
+                buttons.forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+            } else {
+                // 切换该标签的选中状态
+                const idx = currentFilters.indexOf(filter);
+                if (idx === -1) {
+                    currentFilters.push(filter);
+                    this.classList.add('active');
+                } else {
+                    currentFilters.splice(idx, 1);
+                    this.classList.remove('active');
+                }
+
+                // 同步“全部”按钮的高亮状态
+                const allBtn = buttons.find(b => b.dataset.filter === 'all');
+                if (allBtn) {
+                    allBtn.classList.toggle('active', currentFilters.length === 0);
+                }
+            }
+
+            renderCostumeGallery();
         });
     });
 }
@@ -1694,7 +1730,7 @@ document.addEventListener('DOMContentLoaded', function () {
     initLoreModal();
 
     // 首次渲染服设图鉴（默认显示全部）
-    renderCostumeGallery('all');
+    renderCostumeGallery();
 
     console.log('✅ 所有功能初始化完成');
 });
