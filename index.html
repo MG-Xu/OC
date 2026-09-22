@@ -1863,10 +1863,10 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 /* ============================================================
-   7. 版块折叠 / 展开
+   7. 版块折叠 / 展开（状态跨页面保持）
    ============================================================ */
 (function () {
-    // ===== 单个版块点击折叠 =====
+    // 单个版块点击折叠
     document.addEventListener('click', function (e) {
         const h3 = e.target.closest('.chapter h3');
         if (!h3) return;
@@ -1874,14 +1874,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const chapter = h3.closest('.chapter');
         if (!chapter) return;
-
-        // 纯图片版块不响应折叠
         if (!chapter.querySelector('.text-only')) return;
 
         chapter.classList.toggle('collapsed');
     });
 
-    // ===== 全局一键收起/展开按钮 =====
+    // 全局按钮
     const btn = document.createElement('button');
     btn.className = 'toggle-all-btn';
     btn.textContent = '收起全部文字';
@@ -1889,51 +1887,38 @@ document.addEventListener('DOMContentLoaded', function () {
 
     let allCollapsed = false;
 
-    // 判断当前页面是否有可折叠的文字版块
-    function updateBtnVisibility() {
+    // 同步当前页面的按钮可见性和折叠状态
+    function syncCurrentPage() {
         const activePage = document.querySelector('.oc-page.active-page');
         if (!activePage) return;
 
-        // 当前页面是否有含 .text-only 的 .chapter
         const hasTextChapter = activePage.querySelector('.chapter .text-only');
-        btn.style.display = hasTextChapter ? '' : 'none';
+        btn.style.display = hasTextChapter ? 'block' : 'none';
+
+        if (hasTextChapter) {
+            activePage.querySelectorAll('.chapter').forEach(ch => {
+                if (!ch.querySelector('.text-only')) return;
+                ch.classList.toggle('collapsed', allCollapsed);
+            });
+            btn.textContent = allCollapsed ? '展开全部文字' : '收起全部文字';
+        }
     }
 
-    // 点击按钮
+    // 点击全局按钮
     btn.addEventListener('click', function () {
         allCollapsed = !allCollapsed;
-
-        const activePage = document.querySelector('.oc-page.active-page');
-        if (!activePage) return;
-
-        const chapters = activePage.querySelectorAll('.chapter');
-        chapters.forEach(ch => {
-            if (!ch.querySelector('.text-only')) return;
-            if (allCollapsed) {
-                ch.classList.add('collapsed');
-            } else {
-                ch.classList.remove('collapsed');
-            }
-        });
-
-        btn.textContent = allCollapsed ? '展开全部文字' : '收起全部文字';
+        syncCurrentPage();
     });
 
-    // ===== 页面切换时更新按钮状态 =====
-    // 监听导航点击，切换后重新判断
+    // 页面切换时只同步，不重置
     document.querySelectorAll('.nav-tag').forEach(tag => {
         tag.addEventListener('click', function () {
-            // 重置折叠状态
-            allCollapsed = false;
-            btn.textContent = '收起全部文字';
-
-            // 延迟一点，等页面切换动画完成后判断
-            setTimeout(updateBtnVisibility, 50);
+            setTimeout(syncCurrentPage, 50);
         });
     });
 
-    // 初始化时也判断一次
-    updateBtnVisibility();
+    // 初始化
+    syncCurrentPage();
 })();
     </script>
 </body>
