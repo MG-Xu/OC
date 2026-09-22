@@ -772,6 +772,78 @@
         padding: 4px 14px;
     }
 }
+
+/* ===== 版块折叠 ===== */
+.chapter h3 {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;  /* 标题在左，图标在右 */
+    cursor: pointer;
+    user-select: none;
+}
+.chapter h3 .chapter-title-text {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+.chapter h3 .toggle-icon {
+    font-size: 14px;
+    color: #c9b28b;
+    transition: transform 0.25s ease;
+    flex-shrink: 0;
+    margin-left: 12px;
+}
+.chapter.collapsed h3 .toggle-icon {
+    transform: rotate(-90deg);
+}
+
+/* 折叠时隐藏版块主体 */
+.chapter.collapsed .text-only,
+.chapter.collapsed .media-row,
+.chapter.collapsed .image-grid {
+    display: none;
+}
+
+/* 折叠时的视觉提示 */
+.chapter.collapsed {
+    opacity: 0.85;
+}
+.chapter.collapsed:hover {
+    opacity: 1;
+}
+
+/* ===== 全局一键收起/展开按钮 ===== */
+.toggle-all-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    padding: 12px 22px;
+    border-radius: 30px;
+    border: none;
+    background: #2a2a2a;
+    color: #f0ebe4;
+    font-size: 14px;
+    letter-spacing: 1px;
+    cursor: pointer;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+    transition: all 0.25s ease;
+    z-index: 100;
+    font-family: inherit;
+}
+.toggle-all-btn:hover {
+    background: #c9b28b;
+    color: #1e1e1e;
+    transform: translateY(-2px);
+}
+@media (max-width: 600px) {
+    .toggle-all-btn {
+        bottom: 20px;
+        right: 20px;
+        padding: 10px 18px;
+        font-size: 13px;
+    }
+}
     </style>
 </head>
 <body>
@@ -904,7 +976,13 @@
 
             <!-- 版块1：背景故事 -->
             <div class="chapter">
-                <h3>背景故事<span class="badge badge-blue">片段01</span></h3>
+                <h3>
+    <span class="chapter-title-text">
+        背景故事
+        <span class="badge badge-blue">片段01</span>
+    </span>
+    <span class="toggle-icon">▼</span>
+</h3>
                 <div class="text-only">
                     <p>例行巡逻至西街，这里的小商贩较多，常惹口角，真论起道理来多半双方都占点理只是不肯退让。今日也是这般情景，两小贩本还是站在街两边吵嘴，话赶话的火气窜上来直在路中间动起手来。</p>
                     <p>他听见前面喧哗声和围观的人群，赶紧冲进去阻拦，可那两小贩扯着他的袖子一口一句官爷评评理。他不好跟普通人动手，只能尽力调节，可小贩看他年轻，并未听进去他的话，局面反而更是混乱。</p>
@@ -915,7 +993,13 @@
 
             <!-- 版块2：背景故事 -->
             <div class="chapter">
-                <h3>背景故事<span class="badge badge-blue">片段02</span></h3>
+                <h3>
+    <span class="chapter-title-text">
+        背景故事
+        <span class="badge badge-blue">片段02</span>
+    </span>
+    <span class="toggle-icon">▼</span>
+</h3>
                 <div class="text-only">
                     <p>今日是休沐日，他本想上街随意走走，不留神又走上了平日巡逻的路线，不过虽是午时却天色渐阴，恐怕要下雨，路上行人也少了许多。</p>
                     <p>随意找了个茶摊坐下歇歇脚，没喝上一盏茶，大雨倾盆而下，他便想着等雨势缓些再走。路上行人或是迎着雨赶回家，或是在街边铺子下避雨，也有到这茶摊里来的。湿了衣服或是被碍了事的难免面上带上几份愁绪。</p>
@@ -927,7 +1011,13 @@
 
             <!-- 版块3：背景故事 -->
             <div class="chapter">
-                <h3>背景故事<span class="badge badge-blue">片段03</span></h3>
+                <h3>
+    <span class="chapter-title-text">
+        背景故事
+        <span class="badge badge-blue">片段03</span>
+    </span>
+    <span class="toggle-icon">▼</span>
+</h3>
                 <div class="text-only">
                     <p>上月起城中祸事频发，忙碌了好些日子查问了好些人总算有了些进展，他领了任务拿着几幅画像重回案发地附近想再找找证人。街坊走遍了也没获得什么新线索，有点丧气时听见巷子深处传来窸窸窣窣的声音，他放轻脚步慢慢走过去。</p>
                     <p>就见几只流浪狗围着一个少女，她挎着个鼓鼓囊囊的布袋子，手里动作着把包子撕开，边说“我身上可没什么银子了，你们还挑上口味了，凑合着吃吧”，其中一只黑色大狗呜汪了几声，蹭蹭她的手，少女又说到“好啦不许撒娇，大黄都和我说了，你们昨日去讨食结果被赶出来，是你推着它才挨了一棍子。今日你的份得分大黄一半。”</p>
@@ -1004,7 +1094,13 @@
 
             <!-- 版块1：背景故事 -->
             <div class="chapter">
-                <h3>背景故事<span class="badge badge-blue">主线故事</span></h3>
+                <h3>
+    <span class="chapter-title-text">
+        背景故事
+        <span class="badge badge-blue"主线故事</span>
+    </span>
+    <span class="toggle-icon">▼</span>
+</h3>
                 <div class="text-only">
                     <p>她是受人追捧的天才傀儡师，贵族们奉上大笔财宝只为定制一只她亲手制作的傀儡。</p>
                     <p>她听过无数人的故事，替无数人实现了愿望填补上缺憾，但她总觉得还没有一只傀儡能让她发挥全部的技艺。</p>
@@ -1027,7 +1123,13 @@
 
             <!-- 版块2：背景故事 -->
             <div class="chapter">
-                <h3>背景故事<span class="badge badge-blue">片段01</span></h3>
+                <h3>
+    <span class="chapter-title-text">
+        背景故事
+        <span class="badge badge-blue">片段01</span>
+    </span>
+    <span class="toggle-icon">▼</span>
+</h3>
                 <div class="text-only">
                     <p>宴会已经开始了一段时间，但场中的贵族们还在频频望向门口，他们都听说那位有名的傀儡师今晚会来。</p>
                     <p>在众人翘首以盼中，她终于来了，不过她无心寒暄，全部的注意力都在那只她带来的傀儡上。这还是外界第一次见到这传说中的完美作品，确实挑不出一丝不和谐之处。也只有对傀儡的赞美能换来傀儡师视线的短暂驻足。</p>
@@ -1052,7 +1154,13 @@
             <div class="oc-header"><h2>【世界二】来世长安</h2><span>前世今生的故事</span></div>
             <!-- 版块1：背景故事 -->
             <div class="chapter">
-                <h3>背景故事<span class="badge badge-blue">主线故事</span></h3>
+                <h3>
+    <span class="chapter-title-text">
+        背景故事
+        <span class="badge badge-blue">主线故事</span>
+    </span>
+    <span class="toggle-icon">▼</span>
+</h3>
                 <div class="text-only">
                     <p>「前世」</p>
                     <p>她是公主。</p>
@@ -1106,7 +1214,13 @@
 
             <!-- 版块1：背景故事 -->
             <div class="chapter">
-                <h3>背景故事<span class="badge badge-blue">主线故事</span></h3>
+                <h3>
+    <span class="chapter-title-text">
+        背景故事
+        <span class="badge badge-blue">主线故事</span>
+    </span>
+    <span class="toggle-icon">▼</span>
+</h3>
                 <div class="text-only">
                     <p>仙门之中，她是出了名的乖巧。师长们提起她都笑称：天赋上佳品貌出众，无一处不好，就是性子闷了些。她确实没有出门历练过。师父说外面的人人心叵测，她便老老实实地修行。她偶尔会想，师门之外的世界是什么样子，可她不会问，问了就是“心思浮动”，就是“道心不稳”。</p>
                     <p>那一日她在后山修炼一门术法，天地忽然震颤，一道裂隙在她面前撕开，对面涌来的一种她从未感知过的纯净到几乎锐利的力量。</p>
@@ -1133,7 +1247,13 @@
 
             <!-- 版块2：背景故事 -->
             <div class="chapter">
-                <h3>背景故事<span class="badge badge-blue">片段01</span></h3>
+                <h3>
+    <span class="chapter-title-text">
+        背景故事
+        <span class="badge badge-blue">片段01</span>
+    </span>
+    <span class="toggle-icon">▼</span>
+</h3>
                 <div class="text-only">
                     <p>她向他展示御风的术法，手指引动着风将她托起。她朝少年招招手，示意没有人在附近，</p>
                     <p>于是少年展开了双翼飞到她的身前。即便不是第一次见到这对羽翼，可每一次看都美的让她失语，纯白的羽毛，还有柔和的金光流转在尾尖。少年的脸庞仿佛也染上一层光晕，他垂眼看她，如肃穆的神明。</p>
@@ -1159,7 +1279,13 @@
 
             <!-- 版块1：背景故事 -->
             <div class="chapter">
-                <h3>背景故事<span class="badge badge-blue">主线故事</span></h3>
+                <h3>
+    <span class="chapter-title-text">
+        背景故事
+        <span class="badge badge-blue">主线故事</span>
+    </span>
+    <span class="toggle-icon">▼</span>
+</h3>
                 <div class="text-only">
                     <p>她们两家是三代世仇。没有人记得仇恨的源头是什么了——是生意场上的纠纷，是某位先人的血债都不重要了。重要的是，仇恨本身已代代相传，刻进骨髓。</p>
                     <p>她是家中独女，他是唯一的继承人。</p>
@@ -1218,7 +1344,13 @@
 
             <!-- 版块1：背景故事 -->
             <div class="chapter">
-                <h3>背景故事<span class="badge badge-blue">主线故事</span></h3>
+                <h3>
+    <span class="chapter-title-text">
+        背景故事
+        <span class="badge badge-blue">主线故事</span>
+    </span>
+    <span class="toggle-icon">▼</span>
+</h3>
                 <div class="text-only">
                     <p>他们是在练习生时期认识的，两个人被分到同一个班，同一个考核小组。她是个典型的“天才型”——学什么都快，记动作一遍就会，但练两遍就开始喊无聊。他是“努力型”——天资不算最出众，但每天最早到练习室，最晚离开，一遍不行就一百遍。</p>
                     <p>第一次合作舞台，老师把他们分到了一组。</p>
@@ -1257,7 +1389,13 @@
 
             <!-- 版块1：背景故事 -->
             <div class="chapter">
-                <h3>背景故事<span class="badge badge-blue">片段01</span></h3>
+                <h3>
+    <span class="chapter-title-text">
+        背景故事
+        <span class="badge badge-blue">片段01</span>
+    </span>
+    <span class="toggle-icon">▼</span>
+</h3>
                 <div class="text-only">
                     <p>青梅竹马的两人在长辈的婚礼上作为伴郎伴娘，难得的看见对方正式着装的一面，有惊讶有惊艳也有羞赧。</p>
                     <p>并非婚礼的主角，但是在浪漫幸福的氛围中情愫悄然萌芽。走在新人后面偷偷对视、找一个角落分享甜点、在仪式尾声私藏一束鲜花.....</p>
