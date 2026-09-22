@@ -817,7 +817,7 @@
 .toggle-all-btn {
     position: fixed;
     bottom: 30px;
-    right: 30px;
+    left: 30px;                /* ← 改到左下角，避开右侧导航 */
     padding: 12px 22px;
     border-radius: 30px;
     border: none;
@@ -838,8 +838,8 @@
 }
 @media (max-width: 600px) {
     .toggle-all-btn {
-        bottom: 20px;
-        right: 20px;
+        bottom: 16px;
+        left: 16px;
         padding: 10px 18px;
         font-size: 13px;
     }
