@@ -1863,6 +1863,47 @@ document.addEventListener('DOMContentLoaded', function () {
 
     console.log('✅ 所有功能初始化完成');
 });
+
+/* ============================================================
+   7. 版块折叠 / 展开
+   ============================================================ */
+(function () {
+    // ===== 单个版块点击折叠 =====
+    // 用事件委托，自动适配所有 .chapter（包括以后新增的）
+    document.addEventListener('click', function (e) {
+        const h3 = e.target.closest('.chapter h3');
+        if (!h3) return;
+
+        // 如果点击的是标题里的链接/按钮，不触发折叠（预留）
+        if (e.target.closest('a, button')) return;
+
+        const chapter = h3.closest('.chapter');
+        if (!chapter) return;
+
+        chapter.classList.toggle('collapsed');
+    });
+
+    // ===== 全局一键收起/展开按钮 =====
+    const btn = document.createElement('button');
+    btn.className = 'toggle-all-btn';
+    btn.textContent = '收起全部文字';
+    document.body.appendChild(btn);
+
+    let allCollapsed = false;
+
+    btn.addEventListener('click', function () {
+        allCollapsed = !allCollapsed;
+        const chapters = document.querySelectorAll('.chapter');
+        chapters.forEach(ch => {
+            if (allCollapsed) {
+                ch.classList.add('collapsed');
+            } else {
+                ch.classList.remove('collapsed');
+            }
+        });
+        btn.textContent = allCollapsed ? '展开全部文字' : '收起全部文字';
+    });
+})();
     </script>
 </body>
 </html>
